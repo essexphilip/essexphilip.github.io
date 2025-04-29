@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Text Example</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Text Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+</head>
+<body>
+
+<h2>PDF Text Extractor</h2>
+
+<!-- Input for the PDF URL -->
+<label for="pdfUrl">Enter the PDF URL:</label>
+<input type="text" id="pdfUrl" placeholder="Enter the PDF URL" style="width: 400px;" />
+<button onclick="loadAndExtractText()">Load PDF and Extract Text</button>
+
+<div id="output" style="white-space: pre-wrap; margin-top: 20px;"></div>
+
+<script>
+// Function to load the PDF from an external URL and extract the text
+function loadAndExtractText() {
+    const url = document.getElementById('pdfUrl').value.trim();  // Get the PDF URL entered by the user
+
+    if (!url) {
+        document.getElementById('output').textContent = 'Please enter a valid PDF URL.';
+        return;
+    }
+
+    // Load the PDF using pdf.js
+    pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
+        const pdfDoc = pdfDoc_;
+        const numPages = pdfDoc.numPages;
+        let textContent = '';
+
+        // Extract text from all pages
+        let pagePromises = [];
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            pagePromises.push(pdfDoc.getPage(pageNum).then(function (page) {
+                return page.getTextContent().then(function (text) {
+                    text.items.forEach(function (item) {
+                        textContent += item.str + ' ';
+                    });
+                });
+            }));
+        }
+
+        // Wait for all pages to be processed and display the extracted text
+        Promise.all(pagePromises).then(function () {
+            document.getElementById('output').textContent = textContent;
+        });
+
+    }).catch(function (error) {
+        console.error('Error loading PDF: ', error);
+        document.getElementById('output').textContent = 'Error loading PDF. Please check the URL or try another file.';
+    });
+}
+</script>
+
+</body>
+</html>

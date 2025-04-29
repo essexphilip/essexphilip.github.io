@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Text Extractor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2em;
+            background-color: #f0f2f5;
+            color: #000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1 {
+            text-align: center;
+        }
+        input, button, textarea {
+            width: 100%;
+            margin-top: 1em;
+            padding: 10px;
+            font-size: 1em;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        textarea {
+            height: 300px;
+            margin-bottom: 1em;
+            background: #fff;
+            color: #333;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+        .divider {
+            text-align: center;
+            margin: 1em 0;
+            font-weight: bold;
+        }
+        #loading {
+            text-align: center;
+            margin-top: 1em;
+            font-size: 1.2em;
+            display: none;
+        }
+        .spinner {
+            margin: 10px auto;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #ccc;
+            border-top: 5px solid #007BFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            margin-top: 1em;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #4CAF50;
+            transition: width 0.3s;
+        }
+        #controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 1em;
+        }
+        #controls button {
+            flex: 1;
+        }
+        #darkModeToggle {
+            margin-top: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .dark-mode {
+            background-color: #181818;
+            color: #f0f0f0;
+        }
+        .dark-mode textarea {
+            background: #333;
+            color: #f0f0f0;
+        }
+        @media (max-width: 600px) {
+            #controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>PDF Text Extractor</h1>
+
+    <input type="text" id="pdfUrl" placeholder="Enter PDF URL here">
+    <button onclick="extractFromUrl()">Extract from URL</button>
+
+    <div class="divider">OR</div>
+
+    <input type="file" id="pdfFile" accept="application/pdf">
+    <button onclick="extractFromFile()">Extract from File</button>
+
+    <div id="loading">
+        <div class="spinner"></div>
+        Extracting text, please wait...
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <textarea id="result" placeholder="Extracted text will appear here..." readonly></textarea>
+
+    <div id="controls">
+        <button onclick="downloadText()">Download Text</button>
+        <button onclick="clearText()">Clear Text</button>
+        <button onclick="copyText()">Copy to Clipboard</button>
+    </div>
+
+    <div id="darkModeToggle" onclick="toggleDarkMode()">Toggle Dark Mode</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.min.js"></script>
+
+    <script>
+    async function extractFromUrl() {
+        const url = document.getElementById('pdfUrl').value.trim();
+        if (!url) {
+            alert("Please enter a valid URL.");
+            return;
+        }
+        startLoading();
+        try {
+            const loadingTask = pdfjsLib.getDocument({ url: url });
+            const pdf = await loadingTask.promise;
+            const text = await extractTextFromPdf(pdf);
+            document.getElementById('result').value = text;
+        } catch (error) {
+            console.error(error);
+            document.getElementById('result').value = "Error loading PDF. It might be password protected or invalid.";
+        }
+        stopLoading();
+    }
+
+    async function extractFromFile() {
+        const fileInput = document.getElementById('pdfFile');
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Please upload a PDF file.");
+            return;
+        }
+        startLoading();
+        try {
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const typedArray = new Uint8Array(this.result);
+                const loadingTask = pdfjsLib.getDocument({ data: typedArray });
+                try {
+                    const pdf = await loadingTask.promise;
+                    const text = await extractTextFromPdf(pdf);
+                    document.getElementById('result').value = text;
+                } catch (err) {
+                    document.getElementById('result').value = "Error opening PDF. It might be password protected.";
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        } catch (error) {
+            console.error(error);
+            document.getElementById('result').value = "Error loading PDF file.";
+        }
+        stopLoading();
+    }
+
+    async function extractTextFromPdf(pdf) {
+        let fullText = '';
+        const totalPages = pdf.numPages;
+
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += "\\n\\n--- Page " + pageNum + " ---\\n\\n" + pageText;
+            updateProgress((pageNum / totalPages) * 100);
+        }
+        return fullText.trim();
+    }
+
+    function startLoading() {
+        document.getElementById('loading').style.display = 'block';
+        document.querySelector('.progress-container').style.display = 'block';
+        updateProgress(0);
+        document.getElementById('result').value = '';
+    }
+
+    function stopLoading() {
+        document.getElementById('loading').style.display = 'none';
+        document.querySelector('.progress-container').style.display = 'none';
+    }
+
+    function updateProgress(percent) {
+        document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    function downloadText() {
+        const text = document.getElementById('result').value;
+        if (!text.trim()) {
+            alert("No text to download.");
+            return;
+        }
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'extracted-text.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function clearText() {
+        document.getElementById('result').value = '';
+    }
+
+    function copyText() {
+        const text = document.getElementById('result');
+        if (!text.value.trim()) {
+            alert("No text to copy.");
+            return;
+        }
+        text.select();
+        document.execCommand('copy');
+        alert("Text copied to clipboard.");
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+    }
+    </script>
+
+</body>
+</html>

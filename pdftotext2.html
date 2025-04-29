@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PDF Text Extractor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background-color: #f9f9f9;
+    }
+    input, button, textarea {
+      width: 100%;
+      margin-top: 1em;
+      padding: 10px;
+      font-size: 1em;
+    }
+    textarea {
+      height: 300px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>PDF Text Extractor</h1>
+
+  <input type="text" id="pdfUrl" placeholder="Enter the URL of the PDF file here..." />
+  <input type="file" id="pdfFile" accept="application/pdf" />
+  <button onclick="extractText()">Extract Text</button>
+
+  <textarea id="result" placeholder="Extracted text will appear here..." readonly></textarea>
+
+  <!-- Include PDF.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.min.js"></script>
+  <script>
+    async function extractText() {
+      const url = document.getElementById('pdfUrl').value.trim();
+      const fileInput = document.getElementById('pdfFile');
+      const resultBox = document.getElementById('result');
+      resultBox.value = "Loading and extracting text... Please wait.";
+
+      try {
+        let loadingTask;
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const arrayBuffer = await file.arrayBuffer();
+          loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        } else if (url) {
+          loadingTask = pdfjsLib.getDocument(url);
+        } else {
+          resultBox.value = "Please enter a PDF URL or select a PDF file.";
+          return;
+        }
+
+        const pdf = await loadingTask.promise;
+        let fullText = '';
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map(item => item.str).join(' ');
+          fullText += `\n\n--- Page ${pageNum} ---\n\n${pageText}`;
+        }
+
+        resultBox.value = fullText.trim();
+      } catch (error) {
+        console.error(error);
+        resultBox.value = "Error loading PDF. Please ensure the URL is correct and CORS is allowed, or the file is a valid PDF.";
+      }
+    }
+  </script>
+
+</body>
+</html>
