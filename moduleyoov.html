@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Security Module</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(-45deg, #0a0f1c, #1a2332, #0a0f1c, #203a43);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+      color: #e0e0e0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    /* Circuit board pattern overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://www.transparenttextures.com/patterns/circuit-board.png');
+      opacity: 0.05;
+      z-index: 0;
+      pointer-events: none;
+    }
+    header {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      padding: 1.5rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: #00e5ff;
+    }
+    nav {
+      margin-top: 0.5rem;
+    }
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #80dfff;
+      font-weight: bold;
+      transition: text-shadow 0.3s ease, color 0.3s ease;
+    }
+    nav a:hover {
+      color: #ffffff;
+      text-shadow: 0 0 10px #00e5ff;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    h2 {
+      border-left: 5px solid #00e5ff;
+      padding-left: 10px;
+      color: #00e5ff;
+      margin-top: 2rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: rgba(26, 35, 50, 0.9);
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    li:hover {
+      box-shadow: 0 0 20px #00e5ff;
+      transform: translateY(-5px);
+    }
+    li a {
+      text-decoration: none;
+      color: #80dfff;
+      font-weight: bold;
+    }
+    .icon {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #0f2027;
+      margin-top: 2rem;
+      color: #80dfff;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Learning Materials and Assignment Submission</h1>
+    <nav>
+      <a href="#resources">Resources</a>
+      <a href="#content">Content</a>
+      <a href="#assessment">Assessments</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <div class="container">
+
+    <section id="resources">
+      <h2>Resources</h2>
+      <ul>
+        <li>
+          <a href="https://www.bbc.co.uk/news/articles/c1jzl1lw4y1o">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Jaguar Land Rover staff to remain home in cyber attack fallout
+          </a>
+        </li>
+        <li>
+          <a href="https://www.independent.co.uk/tech/gmail-password-hack-google-login-update-b2814803.html">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Google issues warning to billions of Gmail users over password hack
+          </a>
+        </li>
+        <li>
+          <a href="https://www.bbc.co.uk/news/articles/cr58pqjlnjlo">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            M&S hackers sent abuse and ransom demand directly to CEO - BBC News
+          </a>
+        </li>
+        <li>
+          <a href="https://www.bbc.co.uk/news/articles/cvgnz3r2m7eo">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            What we know about the HMRC phishing attack and how to find out if you're affected
+          </a>
+        </li>
+      </ul>
+    </section>
+
+
+
+    <section id="content">
+      <h2>Content</h2>
+      <ul>
+        <li>
+          <a href="https://www.yoov.plus/share/public/view/68c41feb1ad553251cb0e6cc">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Content
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section id="assessment">
+      <h2>Assessment</h2>
+      <ul>
+        <li>
+          <a href="https://www.yoov.plus/share/public/view/68c5468f1ad553251cb0e7de">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Assessment
+          </a>
+        </li>
+        <li>
+          <a href="https://www.yoov.plus/form/1cf86ef532194561a0bdc51b5bff5779">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Submission and Feedback
+          </a>
+        </li>
+      </ul>
+
+    </section>
+
+
+    <section id="about">
+      <h2>About</h2>
+      <p>New City College</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Contact: <a href="mailto:philip.cheung@ncclondon.ac.uk">philip.cheung@ncclondon.ac.uk</a></p>
+    </section>
+  </div>
+
+  <footer>
+    © 2025 New City College
+  </footer>
+</body>
+</html>
