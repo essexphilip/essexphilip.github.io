@@ -83,10 +83,21 @@
     @media (min-width: 720px){ .grid-2{ grid-template-columns: 1fr 1fr; } }
     @media (min-width: 960px){ .grid-3{ grid-template-columns: repeat(3, 1fr); } }
 
-    .card {
-      background:var(--card); border-radius:var(--radius); box-shadow: var(--shadow);
-      padding:1.2rem; border:1px solid #e9ecef;
-    }
+
+.card { color:#212529; /* darker body text already applied */ }
+.card a{
+  color:#0a58ca;
+  font-weight:700;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+    
+.card a:hover, .card a:focus{
+  color:#063e96;
+  text-decoration-thickness:.16em;
+}
+
+
     .card h3{ margin-top:.2rem; }
 
     /* Timeline */
