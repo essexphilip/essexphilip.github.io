@@ -1,0 +1,15 @@
+<style>
+  h1{
+    color: blue;
+  }
+</style>
+
+<h1 id="heading">This heading is blue</h1>
+<button id="btn" onclick="changeTextToRed()">Make red</button>
+
+<script>
+  function changeTestToRed(){
+    let heading = document.getElementByID("heading");
+    heading.stype = "color: red; background-color: yellow;";
+    heading.innerText = "This heading is read";
+</script>
