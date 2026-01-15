@@ -1,16 +1,18 @@
-<style>
-  h1{
-    color: blue;
-  }
-</style>
+<html>
+  <style>
+    h1{
+      color: blue;
+    }
+  </style>
 
-<h1 id="heading">This heading is blue</h1>
-<button id="btn" onclick="changeTextToRed()">Make red</button>
+  <h1 id="heading">This heading is blue</h1>
+  <button id="btn" onclick="changeTextToRed()">Make red</button>
 
-<script>
-  function changeTextToRed(){
-    let heading = document.getElementByID("heading");
-    heading.style = "color: red; background-color: yellow;";
-    heading.innerText = "This heading is read";
-  }
-</script>
+  <script>
+    function changeTextToRed(){
+      let heading = document.getElementByID("heading");
+      heading.style = "color: red; background-color: yellow;";
+      heading.innerText = "This heading is read";
+    }
+  </script>
+</html>
