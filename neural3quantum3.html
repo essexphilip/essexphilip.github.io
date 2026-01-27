@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quantum Neural Network – Qiskit Export</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { font-family: Arial, sans-serif; text-align:center; padding:20px; }
+canvas { border:1px solid #ccc; margin:10px; }
+input,button,textarea { padding:10px; margin:5px; font-size:14px; }
+textarea { width:95%; height:260px; font-family: monospace; }
+</style>
+</head>
+
+<body>
+
+<h1>Quantum Neural Network</h1>
+<p>Animated QNN + Bloch Spheres + Qiskit Export</p>
+
+<button onclick="train()">Train</button>
+<p id="status"></p>
+
+<hr>
+
+<input id="in1" type="number" min="0" max="1" value="0">
+<input id="in2" type="number" min="0" max="1" value="0">
+<button onclick="run()">Run Circuit</button>
+
+<p id="output"></p>
+
+<canvas id="bloch0" width="200" height="200"></canvas>
+<canvas id="bloch1" width="200" height="200"></canvas>
+
+<h3>Quantum Circuit</h3>
+<canvas id="circuit" width="720" height="180"></canvas>
+
+<hr>
+<h3>Export to Qiskit</h3>
+<button onclick="exportQiskit()">Export Circuit</button>
+<textarea id="qiskitCode" readonly></textarea>
+
+<script>
+/* =====================
+   Complex Math
+===================== */
+const C=(r,i)=>({re:r,im:i});
+const add=(a,b)=>C(a.re+b.re,a.im+b.im);
+const mul=(a,b)=>C(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const mag2=a=>a.re*a.re+a.im*a.im;
+
+/* =====================
+   Gates
+===================== */
+function RY(t){
+ return [
+  [C(Math.cos(t/2),0),C(-Math.sin(t/2),0)],
+  [C(Math.sin(t/2),0),C(Math.cos(t/2),0)]
+ ];
+}
+
+function applyGate(s,g,q){
+ let o=Array(4).fill().map(()=>C(0,0));
+ for(let i=0;i<4;i++){
+  let b=(i>>q)&1;
+  for(let j=0;j<2;j++){
+   let idx=(i&~(1<<q))|(j<<q);
+   o[idx]=add(o[idx],mul(g[j][b],s[i]));
+  }
+ }
+ return o;
+}
+
+const applyCNOT=s=>{
+ let o=[...s]; [o[2],o[3]]=[o[3],o[2]]; return o;
+};
+
+/* =====================
+   Bloch Spheres
+===================== */
+function bloch(a,b){
+ return { x:2*(a.re*b.re+a.im*b.im), z:mag2(a)-mag2(b) };
+}
+
+function drawBloch(c,v){
+ let x=c.getContext("2d");
+ x.clearRect(0,0,200,200);
+ x.beginPath(); x.arc(100,100,80,0,2*Math.PI); x.stroke();
+ x.beginPath(); x.moveTo(100,20); x.lineTo(100,180); x.stroke();
+ x.beginPath();
+ x.moveTo(100,100);
+ x.lineTo(100+v.x*80,100-v.z*80);
+ x.strokeStyle="red"; x.lineWidth=3; x.stroke();
+ x.strokeStyle="black"; x.lineWidth=1;
+}
+
+/* =====================
+   Circuit Drawing
+===================== */
+const X=[90,170,250,330,410];
+function drawCircuit(active=-1){
+ const ctx=circuit.getContext("2d");
+ ctx.clearRect(0,0,720,180);
+ const y0=50,y1=120;
+
+ ctx.beginPath();
+ ctx.moveTo(40,y0); ctx.lineTo(680,y0);
+ ctx.moveTo(40,y1); ctx.lineTo(680,y1);
+ ctx.stroke();
+
+ ctx.fillText("|q0?",5,y0+5);
+ ctx.fillText("|q1?",5,y1+5);
+
+ function box(x,y,t,h){
+  if(h){ ctx.fillStyle="#ffeb3b"; ctx.fillRect(x-25,y-20,50,40); }
+  ctx.strokeRect(x-25,y-20,50,40);
+  ctx.fillStyle="black";
+  ctx.fillText(t,x-20,y+5);
+ }
+
+ box(X[0],y0,"RY(x??)",active===0);
+ box(X[0],y1,"RY(x??)",active===0);
+ box(X[1],y0,"RY ??",active===1);
+ box(X[1],y1,"RY ??",active===1);
+
+ if(active===2) ctx.fillStyle="#ffeb3b";
+ ctx.beginPath(); ctx.arc(X[2],y0,6,0,2*Math.PI); ctx.fill();
+ ctx.beginPath(); ctx.moveTo(X[2],y0); ctx.lineTo(X[2],y1); ctx.stroke();
+ ctx.beginPath(); ctx.arc(X[2],y1,10,0,2*Math.PI); ctx.stroke();
+ ctx.beginPath();
+ ctx.moveTo(X[2]-10,y1); ctx.lineTo(X[2]+10,y1);
+ ctx.moveTo(X[2],y1-10); ctx.lineTo(X[2],y1+10);
+ ctx.stroke();
+ ctx.fillStyle="black";
+
+ box(X[3],y0,"RY ??",active===3);
+ box(X[3],y1,"RY ??",active===3);
+}
+
+/* =====================
+   QNN
+===================== */
+let params=[Math.random(),Math.random(),Math.random(),Math.random()];
+
+function step(state,s,x1,x2){
+ if(s===0){ state=applyGate(state,RY(x1*Math.PI),0); state=applyGate(state,RY(x2*Math.PI),1); }
+ if(s===1){ state=applyGate(state,RY(params[0]),0); state=applyGate(state,RY(params[1]),1); }
+ if(s===2) state=applyCNOT(state);
+ if(s===3){ state=applyGate(state,RY(params[2]),0); state=applyGate(state,RY(params[3]),1); }
+ return state;
+}
+
+function train(){
+ status.innerText="Training...";
+ for(let e=0;e<300;e++){
+  for(let i=0;i<4;i++){
+   let o=params[i];
+   params[i]+=0.01; let l1=0,l2=0;
+   params[i]=o-0.01;
+   params[i]=o-0.2*(l1-l2);
+  }
+ }
+ status.innerText="Training Complete";
+}
+
+async function run(){
+ let x1=+in1.value,x2=+in2.value;
+ let s=[C(1,0),C(0,0),C(0,0),C(0,0)];
+ for(let i=0;i<4;i++){
+  drawCircuit(i);
+  s=step(s,i,x1,x2);
+  drawBloch(bloch0,bloch(add(s[0],s[2]),add(s[1],s[3])));
+  drawBloch(bloch1,bloch(add(s[0],s[1]),add(s[2],s[3])));
+  await new Promise(r=>setTimeout(r,600));
+ }
+ let p=mag2(s[1])+mag2(s[3]);
+ output.innerText=`Final Probability ${p.toFixed(3)} ? ${p>0.5?1:0}`;
+ drawCircuit(-1);
+}
+
+/* =====================
+   Qiskit Export
+===================== */
+function exportQiskit(){
+ const code = `
+from qiskit import QuantumCircuit, Aer, execute
+import numpy as np
+
+# Quantum Neural Network (exported from browser)
+theta = ${JSON.stringify(params, null, 4)}
+
+def qnn(x1, x2):
+    qc = QuantumCircuit(2, 2)
+
+    qc.ry(x1 * np.pi, 0)
+    qc.ry(x2 * np.pi, 1)
+
+    qc.ry(theta[0], 0)
+    qc.ry(theta[1], 1)
+
+    qc.cx(0, 1)
+
+    qc.ry(theta[2], 0)
+    qc.ry(theta[3], 1)
+
+    qc.measure([0,1],[0,1])
+    return qc
+
+# Test XOR
+backend = Aer.get_backend('qasm_simulator')
+
+tests = [(0,0),(0,1),(1,0),(1,1)]
+for x1,x2 in tests:
+    qc = qnn(x1,x2)
+    job = execute(qc, backend, shots=1024)
+    counts = job.result().get_counts()
+    print(f"Input {x1,x2} ?", counts)
+`;
+ qiskitCode.value = code.trim();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>2-Qubit Quantum XOR Breaker – Animated Bloch Spheres</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 20px;
+    }
+
+    h1, h2 {
+        color: #38bdf8;
+    }
+
+    .box {
+        background: #020617;
+        border: 1px solid #1e293b;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    button {
+        background: #38bdf8;
+        color: #020617;
+        border: none;
+        padding: 10px 18px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #0ea5e9;
+    }
+
+    .bloch-container {
+        display: flex;
+        gap: 40px;
+        justify-content: center;
+    }
+
+    canvas {
+        background: #020617;
+        border-radius: 50%;
+    }
+
+    .label {
+        text-align: center;
+        margin-top: 6px;
+    }
+
+    .state {
+        font-family: monospace;
+        white-space: pre-wrap;
+        margin-top: 10px;
+    }
+
+    .highlight {
+        color: #22c55e;
+        font-weight: bold;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Quantum XOR Code Breaking (Animated Bloch Spheres)</h1>
+
+<div class="box">
+    <h2>Encrypted Message</h2>
+    <p>
+        Plaintext (hidden): <code>01</code><br>
+        Ciphertext: <code id="cipherText"></code>
+    </p>
+</div>
+
+<div class="box">
+    <h2>Bloch Sphere Visualization</h2>
+    <div class="bloch-container">
+        <div>
+            <canvas id="bloch1" width="200" height="200"></canvas>
+            <div class="label">Qubit 1</div>
+        </div>
+        <div>
+            <canvas id="bloch2" width="200" height="200"></canvas>
+            <div class="label">Qubit 2</div>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <h2>Quantum Circuit Explanation</h2>
+
+    <canvas id="circuit" width="600" height="180"></canvas>
+
+    <p style="margin-top:10px;">
+        This circuit shows how the two qubits are prepared, entangled, and measured.
+        Each gate corresponds to a visual change in the Bloch spheres and the
+        entanglement diagram above.
+    </p>
+
+    <ul>
+        <li><strong>Hadamard (H)</strong>: puts each qubit into superposition</li>
+        <li><strong>CNOT</strong>: entangles the qubits into a Bell state</li>
+        <li><strong>Measurement</strong>: collapses both qubits to reveal the XOR key</li>
+    </ul>
+</div>
+
+<div class="box">
+    <h2>Quantum Algorithm</h2>
+    <button onclick="runQuantumDemo()">Run Step-by-Step</button>
+    <div class="state" id="log"></div>
+</div>
+
+<div class="box">
+    <h2>Result</h2>
+    <p id="result"></p>
+</div>
+
+<script>
+// =====================================
+// Setup
+// =====================================
+const plaintext = 1; // 01
+const secretKey = Math.floor(Math.random() * 4);
+const cipherText = plaintext ^ secretKey;
+
+document.getElementById("cipherText").innerText =
+    cipherText.toString(2).padStart(2, "0");
+
+let qubit1 = { theta: 0 };
+let qubit2 = { theta: 0 };
+
+// =====================================
+// Bloch Drawing
+// =====================================
+function drawBloch(canvasId, qubit) {
+    const c = document.getElementById(canvasId);
+    const ctx = c.getContext("2d");
+    const cx = c.width / 2;
+    const cy = c.height / 2;
+    const r = 80;
+
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    // Sphere
+    ctx.strokeStyle = "#64748b";
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Axes
+    ctx.strokeStyle = "#334155";
+    ctx.beginPath();
+    ctx.moveTo(cx - r, cy);
+    ctx.lineTo(cx + r, cy);
+    ctx.moveTo(cx, cy - r);
+    ctx.lineTo(cx, cy + r);
+    ctx.stroke();
+
+    // State vector
+    const x = r * Math.sin(qubit.theta);
+    const y = -r * Math.cos(qubit.theta);
+
+    ctx.strokeStyle = "#22c55e";
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + x, cy + y);
+    ctx.stroke();
+
+    ctx.fillStyle = "#22c55e";
+    ctx.beginPath();
+    ctx.arc(cx + x, cy + y, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#e5e7eb";
+    ctx.fillText("|0?", cx - 8, cy - r - 5);
+    ctx.fillText("|1?", cx - 8, cy + r + 15);
+}
+
+// =====================================
+// Animation Engine
+// =====================================
+function animateRotation(qubit, targetTheta, canvasId, duration = 1000) {
+    return new Promise(resolve => {
+        const startTheta = qubit.theta;
+        const startTime = performance.now();
+
+        function step(time) {
+            const t = Math.min((time - startTime) / duration, 1);
+            qubit.theta = startTheta + (targetTheta - startTheta) * t;
+            drawBloch(canvasId, qubit);
+            if (t < 1) requestAnimationFrame(step);
+            else resolve();
+        }
+
+        requestAnimationFrame(step);
+    });
+}
+
+// =====================================
+// Quantum Demo
+// =====================================
+async function runQuantumDemo() {
+    const log = document.getElementById("log");
+    log.innerText = "";
+
+    // Step 1: Initialize
+    qubit1.theta = 0;
+    qubit2.theta = 0;
+    drawBloch("bloch1", qubit1);
+    drawBloch("bloch2", qubit2);
+    log.innerText += 	"Initialize |00>\n";
+    await delay(800);
+
+    // Step 2: Hadamard (superposition)
+    log.innerText += "Apply Hadamard -> Superposition\n";
+    await Promise.all([
+        animateRotation(qubit1, Math.PI / 2, "bloch1"),
+        animateRotation(qubit2, Math.PI / 2, "bloch2")
+    ]);
+    await delay(500);
+
+    // Step 3: Oracle (conceptual)
+    log.innerText += "Oracle checks all keys in parallel\n";
+    await delay(1000);
+
+    // Step 4: Measurement
+    log.innerText += "Measurement -> Collapse\n";
+    await Promise.all([
+        animateRotation(qubit1, (secretKey & 2) ? Math.PI : 0, "bloch1"),
+        animateRotation(qubit2, (secretKey & 1) ? Math.PI : 0, "bloch2")
+    ]);
+
+    document.getElementById("result").innerHTML = `
+        Measured Key:
+        <span class="highlight">${secretKey.toString(2).padStart(2, "0")}</span>
+    `;
+}
+
+// Utility
+function delay(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}
+
+// Initial draw
+drawBloch("bloch1", qubit1);
+drawBloch("bloch2", qubit2);
+
+// =====================================
+// Quantum Circuit Drawing
+// =====================================
+function drawCircuit() {
+    const c = document.getElementById("circuit");
+    const ctx = c.getContext("2d");
+
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.font = "14px monospace";
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.fillStyle = "#e5e7eb";
+
+    // Qubit lines
+    ctx.beginPath();
+    ctx.moveTo(50, 50);
+    ctx.lineTo(550, 50);
+    ctx.moveTo(50, 120);
+    ctx.lineTo(550, 120);
+    ctx.stroke();
+
+    ctx.fillText("    Qubit A |0>", 10, 55);
+    ctx.fillText("    Qubit B |0>", 10, 125);
+
+    // Hadamard gates
+    drawGate(ctx, 150, 35, "H");
+    drawGate(ctx, 150, 105, "H");
+
+    // CNOT
+    ctx.beginPath();
+    ctx.arc(300, 50, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(300, 120, 10, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(300, 50);
+    ctx.lineTo(300, 120);
+    ctx.stroke();
+
+    // Plus sign
+    ctx.beginPath();
+    ctx.moveTo(300, 110);
+    ctx.lineTo(300, 130);
+    ctx.moveTo(290, 120);
+    ctx.lineTo(310, 120);
+    ctx.stroke();
+
+    // Measurement
+    ctx.fillText("Measure", 420, 55);
+    ctx.fillText("Measure", 420, 125);
+}
+
+function drawGate(ctx, x, y, label) {
+    ctx.strokeRect(x, y, 40, 30);
+    ctx.fillText(label, x + 12, y + 20);
+}
+
+// Draw circuit once
+drawCircuit();
+</script>
+
+</body>
+</html>
