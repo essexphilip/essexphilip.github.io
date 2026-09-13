@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyber Game Hub</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light {
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    header {
+      padding: 40px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .game-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    body.light .game-card {
+      background: white;
+      color: #222;
+    }
+
+    .thumb {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(45deg,#00c6ff,#0072ff);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:2rem;
+    }
+
+    .tags span {
+      display:inline-block;
+      background:#0072ff;
+      padding:4px 10px;
+      border-radius:12px;
+      font-size:0.75rem;
+      margin:3px 3px 6px 0;
+    }
+
+    .edu {
+      font-size:0.8rem;
+      opacity:0.85;
+      margin-bottom:8px;
+    }
+
+    .links {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .play-btn {
+      padding:8px 14px;
+      border-radius:20px;
+      background:#00c6ff;
+      color:white;
+      text-decoration:none;
+      font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="toggle" onclick="toggleMode()">🌙 / ☀️</button>
+  <h1>🎮 Cyber Game Hub</h1>
+  <p>Educational games • Maths • Computing • AI</p>
+</header>
+
+<section class="container">
+
+  <div style="grid-column: 1 / -1; text-align:center; margin-bottom:20px;">
+    <input id="search" type="text" placeholder="Search games..." style="padding:12px 16px; width:100%; max-width:400px; border-radius:30px; border:none; font-size:1rem;" onkeyup="filterGames()" />
+  </div>
+
+  <div class="game-card" data-title="$&">
+    <div class="game-icon">🐍</div>
+    <h2>Maths Snake</h2>
+    <p>Classic snake gameplay with maths challenges.</p>
+    <a class="play-btn" href="http://cybergame.uksouth.cloudapp.azure.com/user1/game/mathssnake/" target="_blank">Play</a>
+  </div>
+
+  <div class="game-card" data-title="$&">
+    <div class="game-icon">🔢</div>
+    <h2>Binary Game</h2>
+    <p>Practice binary number concepts interactively.</p>
+    <a class="play-btn" href="http://cybergame.uksouth.cloudapp.azure.com/user1/game/binary/binary1.html" target="_blank">Play</a>
+  </div>
+
+  <div class="game-card" data-title="$&">
+    <div class="game-icon">🧱</div>
+    <h2>Maths Tetris</h2>
+    <p>Drop blocks and solve maths to survive.</p>
+    <a class="play-btn" href="http://cybergame.uksouth.cloudapp.azure.com/user1/game/MathsTetris/" target="_blank">Play</a>
+  </div>
+
+  <div class="game-card" data-title="$&">
+    <div class="game-icon">🔁</div>
+    <h2>Decimal ↔ Binary</h2>
+    <p>Convert numbers between decimal and binary.</p>
+    <a class="play-btn" href="http://cybergame.uksouth.cloudapp.azure.com/user1/game/decimal_binary/Javascript_OO_calculate3_1.html" target="_blank">Play</a>
+  </div>
+
+  <div class="game-card" data-title="$&">
+    <div class="game-icon">📐</div>
+    <h2>Matrices</h2>
+    <p>Explore matrix operations visually.</p>
+    <a class="play-btn" href="http://cybergame.uksouth.cloudapp.azure.com/user1/game/omarmatrices/index2.html" target="_blank">Play</a>
+  </div>
+
+  <div class="game-card" data-title="$&">
+    <div class="game-icon">🧠</div>
+    <h2>Neural Game</h2>
+    <p>Learn neural network ideas through play.</p>
+    <a class="play-btn" href="http://cybergame.uksouth.cloudapp.azure.com/user1/game/neural/neural3.html" target="_blank">Play</a>
+  </div>
+
+  <div class="game-card" data-title="$&">
+    <div class="game-icon">👾</div>
+    <h2>Sprite Game</h2>
+    <p>Sprite animation and interaction demo.</p>
+    <a class="play-btn" href="http://cybergame.uksouth.cloudapp.azure.com/user1/game/sprites/sprite2.html" target="_blank">Play</a>
+  </div>
+
+  <div class="game-card" data-title="$&">
+    <div class="game-icon">📈</div>
+    <h2>Tangent Game</h2>
+    <p>Understand tangents and slopes interactively.</p>
+    <a class="play-btn" href="http://cybergame.uksouth.cloudapp.azure.com/user1/game/tangent1/" target="_blank">Play</a>
+  </div>
+
+</section>
+
+<footer>
+  © 2026 Cyber Game Hub · Built for learning & fun
+</footer>
+
+<script>
+  function toggleMode() {
+    document.body.classList.toggle('light');
+  }
+</script>
+
+<script>
+  function filterGames() {
+    const query = document.getElementById('search').value.toLowerCase();
+    const cards = document.querySelectorAll('.game-card');
+    cards.forEach(card => {
+      const text = card.innerText.toLowerCase();
+      card.style.display = text.includes(query) ? 'block' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html>
