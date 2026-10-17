@@ -6,7 +6,7 @@
 2. **The five technical controls** – the security controls every organisation must meet
 3. **How to get certified** – the two certification levels, five steps to certification, fees and official resources
 
-[Live site](https://essexphilip.github.io/) · [Repository](https://github.com/essexphilip/)
+[Live site](https://essexphilip.github.io/) · [Repository](https://github.com/essexphilip/essexphilip.github.io)
 
 ![The site shown on desktop, tablet and mobile](docs/testing/responsive-desktop.png)
 
