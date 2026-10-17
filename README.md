@@ -6,7 +6,7 @@
 2. **The five technical controls** – the security controls every organisation must meet
 3. **How to get certified** – the two certification levels, five steps to certification, fees and official resources
 
-[Live site](https://YOUR-GITHUB-USERNAME.github.io/cyber-essentials-guide/) · [Repository](https://github.com/YOUR-GITHUB-USERNAME/cyber-essentials-guide)
+[Live site](https://essexphilip.github.io/) · [Repository](https://github.com/essexphilip/)
 
 ![The site shown on desktop, tablet and mobile](docs/testing/responsive-desktop.png)
 
